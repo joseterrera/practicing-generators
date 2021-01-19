@@ -1,0 +1,75 @@
+<html>
+  <style>
+    a {
+      display: inline-block;
+      margin-right: 20px;
+    }
+  </style>
+<body>
+  <nav style="margin: 20px;">
+    <a href="index.html">print chunk</a>
+    <a href="get-a-card.html">get a card</a>
+  </nav>
+  <button id="button">Give me a card</button>
+  <div id="write"></div>
+<script>
+
+let suits = ['♠','❤','⬩','♣']
+let faces = ['K','Q','J','10','9','8','7','6','5','4','3','2','A']
+let cards = []
+for( let suitItem of suits) {
+  for( let faceItem of faces) {
+    cards.push(`${faceItem} ${suitItem}`)   
+  }  
+}
+
+function shuffle(arr) {
+  for( let index = 0 ; index < arr.length - 2; index++) {
+    // pick a number between index and arr.length
+    let rand = index + Math.floor(Math.random() * (arr.length - index))
+    ;[ arr[index], arr[rand] ] = [ arr[rand], arr[index] ]
+  }
+}
+
+
+
+function* getACard() {
+  let freshDeck = [...cards]
+  shuffle(freshDeck)
+  for( let cardItem of freshDeck) {
+    yield cardItem
+  }
+
+}
+
+
+function* chunk(n,iter) {
+ let collection = []
+ for( let item of iter) {
+   collection.push(item)
+   if(collection.length >= n) {
+     yield collection
+     collection = []
+   }
+ }
+}
+
+
+let cardIterChunk = chunk(5,getACard());
+
+button.addEventListener('click',() => {
+  let div = document.createElement('div')
+  const currentChunk = cardIterChunk.next()
+  console.log(currentChunk.done)
+  if(currentChunk.done === true) {
+    return
+  }
+  div.innerText = currentChunk.value
+  write.appendChild(div)
+})
+
+
+</script>
+
+</body>
+</html>
